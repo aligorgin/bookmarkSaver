@@ -6,7 +6,9 @@ const websiteNameEl = document.getElementById('website-name');
 const websiteUrlEl = document.getElementById('website-URL');
 const bookmarksContainer = document.getElementById('bookmarks-container');
 
-// show modal, fouces on Input
+let bookmarks = [];
+
+// show modal, focus on Input
 function showModal() {
     modal.classList.add('show-modal');
     websiteNameEl.focus();
@@ -35,6 +37,24 @@ function validate(nameValue, urlValue) {
     return true;
 }
 
+// fetch bookmarks
+function fetchBookmarks() {
+    // get bookmarks from localStorage if available
+    if (localStorage.getItem('bookmarks')){
+        bookmarks = JSON.parse(localStorage.getItem('bookmarks'))
+    }else {
+        // creat bookmarks array in localstorage
+        bookmarks = [
+            {
+                name:'Jacinto Design',
+                url: 'https://jacinto.design',
+            },
+        ];
+        localStorage.setItem('bookmarks',JSON.stringify(bookmarks));
+    }
+    console.log(bookmarks);
+}
+
 // handle data from Form
 function storeBookmark(e) {
     e.preventDefault();
@@ -43,13 +63,24 @@ function storeBookmark(e) {
     if (!urlValue.includes('http://', 'https://')) {
         urlValue = `https://${urlValue}`;
     }
-    console.log(nameValue, urlValue);
     // essentially we are doing this for evaluate the code blow
     if (!validate(nameValue,urlValue)){
         // break out the function and not doing anything blow it
         return false;
     }
+    const bookmark = {
+        name:nameValue,
+        url:urlValue
+    };
+    bookmarks.push(bookmark);
+    localStorage.setItem('bookmarks',JSON.stringify(bookmarks));
+    fetchBookmarks();
+    bookmarkForm.reset();
+    websiteNameEl.focus();
 }
 
 // event listeners
 bookmarkForm.addEventListener('submit', storeBookmark);
+
+// on load, fetch bookmarks
+fetchBookmarks();
